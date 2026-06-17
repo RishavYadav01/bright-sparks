@@ -16,7 +16,13 @@ public class AdminController {
     private final AdminRepository adminRepository;
 
     public AdminController(AdminRepository adminRepository) {
+
         this.adminRepository = adminRepository;
+
+    }
+    @GetMapping("/all")
+    public java.util.List<Admin> getAllAdmins() {
+        return adminRepository.findAll();
     }
 
     @PostMapping("/login")
@@ -52,4 +58,5 @@ public class AdminController {
 
         return response;
     }
+
 }
