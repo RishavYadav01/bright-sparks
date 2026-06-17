@@ -1,18 +1,21 @@
 package com.brightsparks.bright_sparks_backend.service;
 
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    private final String apiKey =
+            System.getenv("BREVO_API_KEY");
 
 
     public void sendEnquiryNotification(
@@ -22,77 +25,49 @@ public class EmailService {
             String message
     ) {
 
-        try {
+        String htmlContent = """
+                <div style="font-family:Arial;padding:20px">
 
-            MimeMessage mimeMessage =
-                    mailSender.createMimeMessage();
+                <h2 style="color:#2563eb">
+                🚨 New Bright Sparks Enquiry
+                </h2>
 
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(mimeMessage, true);
+                <hr>
 
+                <p><b>Name:</b> %s</p>
+                <p><b>Phone:</b> %s</p>
+                <p><b>Email:</b> %s</p>
 
-            helper.setFrom(
-                    "brightsparks.rnc.edu@gmail.com",
-                    "Bright Sparks Academy"
-            );
+                <h3>Message</h3>
 
-            helper.setTo(
-                    "rishavyadav87421@gmail.com"
-            );
+                <div style="
+                background:#f8fafc;
+                padding:15px;
+                border-radius:10px;
+                ">
+                %s
+                </div>
 
+                <br>
 
-            helper.setSubject(
-                    "🚨 New Bright Sparks Enquiry"
-            );
-
-
-            String htmlContent = """
-                <div style="font-family: Arial, sans-serif; padding:20px;">
-
-                    <h2 style="color:#2563eb;">
-                        🚨 New Enquiry Received
-                    </h2>
-
-                    <hr>
-
-                    <p><strong>Name:</strong> %s</p>
-                    <p><strong>Phone:</strong> %s</p>
-                    <p><strong>Email:</strong> %s</p>
-
-                    <h3>Message</h3>
-
-                    <div style="
-                        background:#f8fafc;
-                        padding:15px;
-                        border-radius:10px;
-                        border:1px solid #e2e8f0;
-                    ">
-                        %s
-                    </div>
-
-                    <br>
-
-                    <p style="color:gray;">
-                        Bright Sparks Admission CRM
-                    </p>
+                <p>
+                Bright Sparks Admission CRM
+                </p>
 
                 </div>
                 """.formatted(
-                    name,
-                    phone,
-                    email,
-                    message
-            );
+                name,
+                phone,
+                email,
+                message
+        );
 
 
-            helper.setText(htmlContent, true);
-
-            mailSender.send(mimeMessage);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendEmail(
+                "rishavyadav87421@gmail.com",
+                "🚨 New Bright Sparks Enquiry",
+                htmlContent
+        );
     }
 
 
@@ -102,88 +77,168 @@ public class EmailService {
             String studentEmail
     ) {
 
-        try {
 
-            MimeMessage mimeMessage =
-                    mailSender.createMimeMessage();
+        String htmlContent = """
+                <div style="font-family:Arial;padding:20px">
 
+                <h2 style="color:#2563eb">
+                Thank You for Your Enquiry
+                </h2>
 
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(mimeMessage, true);
+                <p>
+                Dear %s,
+                </p>
 
+                <p>
+                Thank you for contacting
+                <b>Bright Sparks Academy</b>.
+                </p>
 
+                <p>
+                We have received your enquiry.
+                Our admission team will contact you shortly.
+                </p>
 
-            helper.setFrom(
-                    "brightsparks.rnc.edu@gmail.com",
-                    "Bright Sparks Academy"
-            );
+                <br>
 
-
-            helper.setTo(studentEmail);
-
-
-            helper.setSubject(
-                    "Thank You for Contacting Bright Sparks"
-            );
-
-
-            String htmlContent = """
-                <div style="font-family:Arial,sans-serif;padding:20px;">
-
-                    <h2 style="color:#2563eb;">
-                        Thank You for Your Enquiry
-                    </h2>
-
-
-                    <p>
-                        Dear %s,
-                    </p>
-
-
-                    <p>
-                        Thank you for contacting
-                        <strong>Bright Sparks Academy</strong>.
-                    </p>
-
-
-                    <p>
-                        We have successfully received your enquiry.
-                        Our admission team will contact you shortly.
-                    </p>
-
-
-                    <div style="
-                        background:#eff6ff;
-                        padding:15px;
-                        border-radius:10px;
-                        margin-top:20px;
-                    ">
-                        📞 Admission Support Team
-                    </div>
-
-
-                    <br>
-
-
-                    <p>
-                        Regards,<br>
-                        Bright Sparks Academy
-                    </p>
-
+                <p>
+                Regards,<br>
+                Bright Sparks Academy
+                </p>
 
                 </div>
                 """.formatted(studentName);
 
 
-            helper.setText(htmlContent, true);
+
+        sendEmail(
+                studentEmail,
+                "Thank You for Contacting Bright Sparks",
+                htmlContent
+        );
+
+    }
 
 
-            mailSender.send(mimeMessage);
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void sendEmail(
+            String receiver,
+            String subject,
+            String htmlContent
+    ) {
+
+
+        try {
+
+
+            JSONObject emailData =
+                    new JSONObject();
+
+
+
+            emailData.put(
+                    "sender",
+                    new JSONObject()
+                            .put(
+                                    "name",
+                                    "Bright Sparks Academy"
+                            )
+                            .put(
+                                    "email",
+                                    "brightsparks.rnc.edu@gmail.com"
+                            )
+            );
+
+
+
+            emailData.put(
+                    "to",
+                    new JSONArray()
+                            .put(
+                                    new JSONObject()
+                                            .put(
+                                                    "email",
+                                                    receiver
+                                            )
+                            )
+            );
+
+
+            emailData.put(
+                    "subject",
+                    subject
+            );
+
+
+            emailData.put(
+                    "htmlContent",
+                    htmlContent
+            );
+
+
+
+            OkHttpClient client =
+                    new OkHttpClient();
+
+
+
+            RequestBody body =
+                    RequestBody.create(
+                            emailData.toString(),
+                            MediaType.parse(
+                                    "application/json"
+                            )
+                    );
+
+
+
+            Request request =
+                    new Request.Builder()
+
+                            .url(
+                                    "https://api.brevo.com/v3/smtp/email"
+                            )
+
+                            .addHeader(
+                                    "api-key",
+                                    apiKey
+                            )
+
+                            .addHeader(
+                                    "Content-Type",
+                                    "application/json"
+                            )
+
+                            .post(body)
+
+                            .build();
+
+
+
+            Response response =
+                    client.newCall(request)
+                            .execute();
+
+
+
+            System.out.println(
+                    "Brevo Email Status: "
+                            + response.code()
+            );
+
+
+
+            response.close();
+
+
         }
+        catch(Exception e){
+
+            e.printStackTrace();
+
+        }
+
     }
 
 }
