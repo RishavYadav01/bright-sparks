@@ -20,7 +20,8 @@ public class CorsConfig {
                         .allowedOrigins(
                                 "http://localhost:5173",
                                 "http://localhost:5174",
-                                "https://bright-sparks-ochre.vercel.app"
+                                "https://bright-sparks-ochre.vercel.app",
+                                "https://brightsparksranchi.vercel.app"
                         )
                         .allowedMethods(
                                 "GET",
