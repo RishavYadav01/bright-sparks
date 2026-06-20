@@ -11,21 +11,28 @@ import {
     ResponsiveContainer
 } from "recharts";
 
+import {
+    BookOpen,
+    Users,
+    MessageSquare,
+    GraduationCap
+} from "lucide-react";
+
 function AdminDashboard() {
+
     const navigate = useNavigate();
 
+    const [stats, setStats] = useState({
+        courses: 0,
+        teachers: 0,
+        testimonials: 0,
+        totalEnquiries: 0,
+        newEnquiries: 0,
+        contacted: 0,
+        admitted: 0
+    });
 
-const [stats, setStats] = useState({
-    courses: 0,
-    teachers: 0,
-    testimonials: 0,
-    totalEnquiries: 0,
-    newEnquiries: 0,
-    contacted: 0,
-    admitted: 0
-});
-
-useEffect(() => {
+    useEffect(() => {
 
         const token = localStorage.getItem("token");
 
@@ -34,202 +41,454 @@ useEffect(() => {
         }
 
     }, [navigate]);
-useEffect(() => {
-    API.get("/dashboard/stats")
-        .then((response) => {
-            setStats(response.data);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-}, []);
 
-const chartData = [
-    {
-        name: "Courses",
-        value: stats.courses || 0
-    },
-    {
-        name: "Teachers",
-        value: stats.teachers || 0
-    },
-    {
-        name: "Enquiries",
-        value: stats.totalEnquiries || 0
-    },
-    {
-        name: "Admitted",
-        value: stats.admitted || 0
-    }
-];
+    useEffect(() => {
 
-const COLORS = [
-    "#2563eb",
-    "#7c3aed",
-    "#16a34a",
-    "#ea580c"
-];
+        API.get("/dashboard/stats")
+            .then((response) => {
+                setStats(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
 
-return (
-    <div className="flex min-h-screen bg-slate-100">
+    }, []);
 
-        <AdminSidebar />
+    const chartData = [
+        {
+            name: "Courses",
+            value: stats.courses || 0
+        },
+        {
+            name: "Teachers",
+            value: stats.teachers || 0
+        },
+        {
+            name: "Enquiries",
+            value: stats.totalEnquiries || 0
+        },
+        {
+            name: "Admitted",
+            value: stats.admitted || 0
+        }
+    ];
 
-        <div className="flex-1 p-10">
+    const COLORS = [
+        "#2563eb",
+        "#7c3aed",
+        "#16a34a",
+        "#ea580c"
+    ];
 
-            <h1 className="text-5xl font-bold mb-10">
-                Welcome Back Admin 👋
-            </h1>
+    const conversionRate =
+        stats.totalEnquiries > 0
+            ? Math.round(
+                (stats.admitted /
+                    stats.totalEnquiries) *
+                100
+            )
+            : 0;
 
-            <div className="grid md:grid-cols-4 gap-6">
+    return (
 
-                <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-8 rounded-3xl shadow-xl">
-                    <h3 className="text-xl">Courses</h3>
-                    <p className="text-5xl font-bold mt-4">
-                        {stats.courses}
-                    </p>
-                </div>
+        <div
+            className="
+            flex
+            min-h-screen
+            bg-gradient-to-br
+            from-slate-50
+            via-blue-50
+            to-purple-50
+            "
+        >
 
-                <div className="bg-gradient-to-r from-green-500 to-green-700 text-white p-8 rounded-3xl shadow-xl">
-                    <h3 className="text-xl">Teachers</h3>
-                    <p className="text-5xl font-bold mt-4">
-                        {stats.teachers}
-                    </p>
-                </div>
+            <AdminSidebar />
 
-                <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-8 rounded-3xl shadow-xl">
-                    <h3 className="text-xl">New Enquiries</h3>
-                    <p className="text-5xl font-bold mt-4">
-                        {stats.newEnquiries}
-                    </p>
-                </div>
+            <div className="flex-1 p-6 md:p-10">
 
-                <div className="bg-gradient-to-r from-red-500 to-pink-600 text-white p-8 rounded-3xl shadow-xl">
-                    <h3 className="text-xl">Admitted</h3>
-                    <p className="text-5xl font-bold mt-4">
-                        {stats.admitted}
-                    </p>
-                </div>
+                {/* Header */}
 
-            </div>
+                <div className="mb-10">
 
-            <div className="grid md:grid-cols-2 gap-8 mt-10">
-
-                <div className="bg-white p-8 rounded-3xl shadow-lg">
-
-                    <h2 className="text-2xl font-bold mb-6">
-                        Admission Funnel
-                    </h2>
-
-                    <div className="space-y-6">
-
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <span>NEW</span>
-                                <span>{stats.newEnquiries}</span>
-                            </div>
-
-                            <div className="h-4 bg-slate-200 rounded-full">
-                                <div
-                                    className="h-4 bg-blue-500 rounded-full"
-                                    style={{
-                                        width: `${Math.max(stats.newEnquiries * 40, 10)}px`
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <span>CONTACTED</span>
-                                <span>{stats.contacted}</span>
-                            </div>
-
-                            <div className="h-4 bg-slate-200 rounded-full">
-                                <div
-                                    className="h-4 bg-yellow-500 rounded-full"
-                                    style={{
-                                        width: `${Math.max(stats.contacted * 40, 10)}px`
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <span>ADMITTED</span>
-                                <span>{stats.admitted}</span>
-                            </div>
-
-                            <div className="h-4 bg-slate-200 rounded-full">
-                                <div
-                                    className="h-4 bg-green-500 rounded-full"
-                                    style={{
-                                        width: `${Math.max(stats.admitted * 40, 10)}px`
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div className="mt-8 p-4 bg-slate-50 rounded-xl">
-
-                        <h3 className="font-bold mb-2">
-                            Conversion Rate
-                        </h3>
-
-                        <p className="text-3xl font-bold text-green-600">
-                            {
-                                stats.totalEnquiries > 0
-                                    ? Math.round(
-                                        (stats.admitted /
-                                            stats.totalEnquiries) * 100
-                                    )
-                                    : 0
-                            }%
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div className="bg-white p-8 rounded-3xl shadow-lg">
-
-                    <h2 className="text-2xl font-bold mb-6">
-                        Institute Analytics
-                    </h2>
-
-                    <ResponsiveContainer
-                        width="100%"
-                        height={350}
+                    <h1
+                        className="
+                        text-4xl
+                        md:text-5xl
+                        font-extrabold
+                        text-slate-900
+                        "
                     >
-                        <PieChart>
+                        Dashboard
+                    </h1>
 
-                            <Pie
-                                data={chartData}
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={120}
-                                dataKey="value"
-                                label
-                            >
-                                {chartData.map((entry, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={
-                                            COLORS[
-                                                index % COLORS.length
-                                            ]
-                                        }
+                    <p className="text-slate-600 mt-3 text-lg">
+                        Welcome back, Admin 👋
+                    </p>
+
+                </div>
+
+                {/* Stat Cards */}
+
+                <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                    <div
+                        className="
+                        bg-gradient-to-r
+                        from-blue-600
+                        to-blue-700
+                        text-white
+                        p-8
+                        rounded-3xl
+                        shadow-xl
+                        "
+                    >
+
+                        <div className="flex justify-between items-center">
+
+                            <div>
+
+                                <p className="text-blue-100">
+                                    Courses
+                                </p>
+
+                                <h2 className="text-5xl font-bold mt-3">
+                                    {stats.courses}
+                                </h2>
+
+                            </div>
+
+                            <BookOpen size={42} />
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        className="
+                        bg-gradient-to-r
+                        from-purple-600
+                        to-purple-700
+                        text-white
+                        p-8
+                        rounded-3xl
+                        shadow-xl
+                        "
+                    >
+
+                        <div className="flex justify-between items-center">
+
+                            <div>
+
+                                <p className="text-purple-100">
+                                    Teachers
+                                </p>
+
+                                <h2 className="text-5xl font-bold mt-3">
+                                    {stats.teachers}
+                                </h2>
+
+                            </div>
+
+                            <Users size={42} />
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        className="
+                        bg-gradient-to-r
+                        from-orange-500
+                        to-red-500
+                        text-white
+                        p-8
+                        rounded-3xl
+                        shadow-xl
+                        "
+                    >
+
+                        <div className="flex justify-between items-center">
+
+                            <div>
+
+                                <p className="text-orange-100">
+                                    New Enquiries
+                                </p>
+
+                                <h2 className="text-5xl font-bold mt-3">
+                                    {stats.newEnquiries}
+                                </h2>
+
+                            </div>
+
+                            <MessageSquare size={42} />
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        className="
+                        bg-gradient-to-r
+                        from-green-500
+                        to-emerald-600
+                        text-white
+                        p-8
+                        rounded-3xl
+                        shadow-xl
+                        "
+                    >
+
+                        <div className="flex justify-between items-center">
+
+                            <div>
+
+                                <p className="text-green-100">
+                                    Admitted
+                                </p>
+
+                                <h2 className="text-5xl font-bold mt-3">
+                                    {stats.admitted}
+                                </h2>
+
+                            </div>
+
+                            <GraduationCap size={42} />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* Charts Section */}
+
+                <div className="grid lg:grid-cols-2 gap-8 mt-10">
+
+                    {/* Admission Funnel */}
+
+                    <div
+                        className="
+                        bg-white
+                        rounded-3xl
+                        p-8
+                        shadow-xl
+                        border
+                        border-slate-100
+                        "
+                    >
+
+                        <h2
+                            className="
+                            text-2xl
+                            font-bold
+                            text-slate-900
+                            mb-8
+                            "
+                        >
+                            Admission Funnel
+                        </h2>
+
+                        <div className="space-y-8">
+
+                            <div>
+
+                                <div className="flex justify-between mb-2">
+
+                                    <span className="font-medium">
+                                        New Enquiries
+                                    </span>
+
+                                    <span>
+                                        {stats.newEnquiries}
+                                    </span>
+
+                                </div>
+
+                                <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
+
+                                    <div
+                                        className="
+                                        h-full
+                                        bg-blue-600
+                                        rounded-full
+                                        "
+                                        style={{
+                                            width: `${Math.min(
+                                                stats.newEnquiries * 10,
+                                                100
+                                            )}%`
+                                        }}
                                     />
-                                ))}
-                            </Pie>
 
-                            <Tooltip />
+                                </div>
 
-                        </PieChart>
-                    </ResponsiveContainer>
+                            </div>
+
+                            <div>
+
+                                <div className="flex justify-between mb-2">
+
+                                    <span className="font-medium">
+                                        Contacted
+                                    </span>
+
+                                    <span>
+                                        {stats.contacted}
+                                    </span>
+
+                                </div>
+
+                                <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
+
+                                    <div
+                                        className="
+                                        h-full
+                                        bg-yellow-500
+                                        rounded-full
+                                        "
+                                        style={{
+                                            width: `${Math.min(
+                                                stats.contacted * 10,
+                                                100
+                                            )}%`
+                                        }}
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div>
+
+                                <div className="flex justify-between mb-2">
+
+                                    <span className="font-medium">
+                                        Admitted
+                                    </span>
+
+                                    <span>
+                                        {stats.admitted}
+                                    </span>
+
+                                </div>
+
+                                <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
+
+                                    <div
+                                        className="
+                                        h-full
+                                        bg-green-500
+                                        rounded-full
+                                        "
+                                        style={{
+                                            width: `${Math.min(
+                                                stats.admitted * 10,
+                                                100
+                                            )}%`
+                                        }}
+                                    />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            className="
+                            mt-8
+                            p-6
+                            rounded-2xl
+                            bg-gradient-to-r
+                            from-green-50
+                            to-green-100
+                            "
+                        >
+
+                            <p className="text-slate-600">
+                                Conversion Rate
+                            </p>
+
+                            <h3
+                                className="
+                                text-5xl
+                                font-bold
+                                text-green-600
+                                mt-2
+                                "
+                            >
+                                {conversionRate}%
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                    {/* Analytics */}
+
+                    <div
+                        className="
+                        bg-white
+                        rounded-3xl
+                        p-8
+                        shadow-xl
+                        border
+                        border-slate-100
+                        "
+                    >
+
+                        <h2
+                            className="
+                            text-2xl
+                            font-bold
+                            text-slate-900
+                            mb-6
+                            "
+                        >
+                            Institute Analytics
+                        </h2>
+
+                        <ResponsiveContainer
+                            width="100%"
+                            height={380}
+                        >
+
+                            <PieChart>
+
+                                <Pie
+                                    data={chartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={130}
+                                    innerRadius={70}
+                                    dataKey="value"
+                                    label
+                                >
+
+                                    {chartData.map((entry, index) => (
+
+                                        <Cell
+                                            key={index}
+                                            fill={
+                                                COLORS[
+                                                index %
+                                                COLORS.length
+                                                    ]
+                                            }
+                                        />
+
+                                    ))}
+
+                                </Pie>
+
+                                <Tooltip />
+
+                            </PieChart>
+
+                        </ResponsiveContainer>
+
+                    </div>
 
                 </div>
 
@@ -237,10 +496,7 @@ return (
 
         </div>
 
-    </div>
-);
-
-
+    );
 }
 
 export default AdminDashboard;

@@ -1,88 +1,222 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
-    FaHome,
-    FaBook,
-    FaChalkboardTeacher,
-    FaComment,
-    FaEnvelope,
-    FaSignOutAlt
-} from "react-icons/fa";
+    LayoutDashboard,
+    BookOpen,
+    GraduationCap,
+    MessageSquare,
+    Mail,
+    LogOut,
+    Sparkles
+} from "lucide-react";
 
 function AdminSidebar() {
 
-    
-const navigate = useNavigate();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-const handleLogout = () => {
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/admin");
+    };
 
-    localStorage.removeItem("token");
+    const menuItems = [
+        {
+            name: "Dashboard",
+            icon: <LayoutDashboard size={20} />,
+            path: "/admin/dashboard"
+        },
+        {
+            name: "Courses",
+            icon: <BookOpen size={20} />,
+            path: "/admin/courses"
+        },
+        {
+            name: "Teachers",
+            icon: <GraduationCap size={20} />,
+            path: "/admin/teachers"
+        },
+        {
+            name: "Testimonials",
+            icon: <MessageSquare size={20} />,
+            path: "/admin/testimonials"
+        },
+        {
+            name: "Enquiries",
+            icon: <Mail size={20} />,
+            path: "/admin/enquiries"
+        }
+    ];
 
-    navigate("/admin");
-};
+    return (
+        <aside
+            className="
+            w-72
+            min-h-screen
+            bg-white/80
+            backdrop-blur-xl
+            border-r
+            border-slate-200
+            shadow-xl
+            flex
+            flex-col
+            "
+        >
 
-return (
-    <div className="w-72 min-h-screen bg-slate-900 text-white p-6">
+            {/* Logo */}
 
-        <h1 className="text-2xl font-bold mb-10">
-            BRIGHT SPARKS
-        </h1>
+            <div className="p-6 border-b border-slate-200">
 
-        <div className="space-y-4">
+                <div className="flex items-center gap-4">
 
-            <button
-                onClick={() => navigate("/admin/dashboard")}
-                className="w-full text-left p-4 rounded-xl bg-slate-800 hover:bg-blue-600 transition"
-            >
-                <FaHome className="inline mr-3" />
-                Dashboard
-            </button>
+                    <div
+                        className="
+                        w-14
+                        h-14
+                        rounded-2xl
+                        bg-gradient-to-r
+                        from-blue-600
+                        to-purple-600
+                        flex
+                        items-center
+                        justify-center
+                        shadow-lg
+                        "
+                    >
+                        <Sparkles className="text-white" size={24} />
+                    </div>
 
-            <button
-                onClick={() => navigate("/admin/courses")}
-                className="w-full text-left p-4 rounded-xl hover:bg-slate-800 transition"
-            >
-                <FaBook className="inline mr-3" />
-                Courses
-            </button>
+                    <div>
 
-            <button
-                onClick={() => navigate("/admin/teachers")}
-                className="w-full text-left p-4 rounded-xl hover:bg-slate-800 transition"
-            >
-                <FaChalkboardTeacher className="inline mr-3" />
-                Teachers
-            </button>
+                        <h1
+                            className="
+                            text-xl
+                            font-extrabold
+                            text-slate-900
+                            "
+                        >
+                            Bright Sparks
+                        </h1>
 
-            <button
-                onClick={() => navigate("/admin/testimonials")}
-                className="w-full text-left p-4 rounded-xl hover:bg-slate-800 transition"
-            >
-                <FaComment className="inline mr-3" />
-                Testimonials
-            </button>
+                        <p className="text-sm text-slate-500">
+                            Admin Portal
+                        </p>
 
-            <button
-                onClick={() => navigate("/admin/enquiries")}
-                className="w-full text-left p-4 rounded-xl hover:bg-slate-800 transition"
-            >
-                <FaEnvelope className="inline mr-3" />
-                Enquiries
-            </button>
+                    </div>
 
-            <button
-                onClick={handleLogout}
-                className="w-full text-left p-4 rounded-xl text-red-400 hover:bg-red-500 hover:text-white transition"
-            >
-                <FaSignOutAlt className="inline mr-3" />
-                Logout
-            </button>
+                </div>
 
-        </div>
+            </div>
 
-    </div>
-);
+            {/* Navigation */}
 
+            <div className="flex-1 p-4">
 
+                <div className="space-y-3">
+
+                    {menuItems.map((item) => (
+
+                        <button
+                            key={item.name}
+                            onClick={() => navigate(item.path)}
+                            className={`
+                                w-full
+                                flex
+                                items-center
+                                gap-4
+                                px-5
+                                py-4
+                                rounded-2xl
+                                font-medium
+                                transition-all
+                                duration-300
+
+                                ${
+                                location.pathname === item.path
+                                    ? `
+                                        bg-gradient-to-r
+                                        from-blue-600
+                                        to-purple-600
+                                        text-white
+                                        shadow-lg
+                                        scale-[1.02]
+                                        `
+                                    : `
+                                        text-slate-700
+                                        hover:bg-slate-100
+                                        hover:text-blue-600
+                                        `
+                            }
+                            `}
+                        >
+
+                            {item.icon}
+
+                            {item.name}
+
+                        </button>
+
+                    ))}
+
+                </div>
+
+            </div>
+
+            {/* Bottom Card */}
+
+            <div className="p-4">
+
+                <div
+                    className="
+                    bg-gradient-to-r
+                    from-blue-600
+                    to-purple-600
+                    rounded-3xl
+                    p-5
+                    text-white
+                    mb-4
+                    shadow-lg
+                    "
+                >
+
+                    <h3 className="font-bold text-lg">
+                        Bright Sparks
+                    </h3>
+
+                    <p className="text-sm text-blue-100 mt-2">
+                        Empowering students through excellence.
+                    </p>
+
+                </div>
+
+                <button
+                    onClick={handleLogout}
+                    className="
+                    w-full
+                    flex
+                    items-center
+                    gap-3
+                    px-5
+                    py-4
+                    rounded-2xl
+                    bg-red-50
+                    text-red-600
+                    hover:bg-red-500
+                    hover:text-white
+                    transition-all
+                    duration-300
+                    "
+                >
+
+                    <LogOut size={20} />
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </aside>
+    );
 }
 
 export default AdminSidebar;
